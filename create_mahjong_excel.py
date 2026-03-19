@@ -578,6 +578,92 @@ VBA_CODE = '''
 ' ============================================================
 
 ' ----------------------------------------------------------
+' セッションシートをアーカイブ（非表示）にする
+' ----------------------------------------------------------
+Sub セッションをアーカイブ()
+    Dim ws As Worksheet: Set ws = ActiveSheet
+    Dim nm As String: nm = ws.Name
+
+    ' 保護シートはアーカイブ不可
+    Dim forbidden As Variant
+    forbidden = Array("マスター", "データ", "設定", "使い方", _
+                      "第1回(4人用サンプル)", "第1回(8人用サンプル)")
+    Dim f As Variant
+    For Each f In forbidden
+        If nm = f Then
+            MsgBox "「" & nm & "」はアーカイブできません。", vbExclamation
+            Exit Sub
+        End If
+    Next f
+
+    If MsgBox("「" & nm & "」をアーカイブ（非表示）にしますか？" & Chr(13) & _
+              "「アーカイブを復元」マクロでいつでも再表示できます。", _
+              vbYesNo + vbQuestion, "アーカイブ確認") = vbNo Then Exit Sub
+
+    ws.Visible = xlSheetHidden
+    MsgBox "「" & nm & "」をアーカイブしました。", vbInformation
+End Sub
+
+' ----------------------------------------------------------
+' アーカイブされたセッションシートを復元（再表示）する
+' ----------------------------------------------------------
+Sub アーカイブを復元()
+    Dim excluded As Variant
+    excluded = Array("データ", "設定")
+
+    ' 非表示のセッションシートを収集
+    Dim sheetNames() As String
+    Dim count As Integer: count = 0
+    Dim ws As Worksheet
+
+    For Each ws In ThisWorkbook.Sheets
+        If ws.Visible = xlSheetHidden Then
+            Dim isExcluded As Boolean: isExcluded = False
+            Dim ex As Variant
+            For Each ex In excluded
+                If ws.Name = ex Then isExcluded = True: Exit For
+            Next ex
+            If Not isExcluded Then
+                count = count + 1
+                ReDim Preserve sheetNames(count - 1)
+                sheetNames(count - 1) = ws.Name
+            End If
+        End If
+    Next ws
+
+    If count = 0 Then
+        MsgBox "アーカイブされたセッションはありません。", vbInformation
+        Exit Sub
+    End If
+
+    ' 一覧を表示して番号入力を受け付ける
+    Dim listStr As String: listStr = ""
+    Dim i As Integer
+    For i = 0 To count - 1
+        listStr = listStr & (i + 1) & ". " & sheetNames(i) & Chr(13)
+    Next i
+
+    Dim input As String
+    input = InputBox("復元するセッションの番号を入力してください:" & Chr(13) & Chr(13) & _
+                     listStr, "アーカイブを復元")
+    If input = "" Then Exit Sub
+
+    If Not IsNumeric(input) Then
+        MsgBox "番号を入力してください。", vbExclamation: Exit Sub
+    End If
+
+    Dim idx As Integer: idx = CInt(input)
+    If idx < 1 Or idx > count Then
+        MsgBox "1〜" & count & " の番号を入力してください。", vbExclamation: Exit Sub
+    End If
+
+    Dim targetName As String: targetName = sheetNames(idx - 1)
+    ThisWorkbook.Sheets(targetName).Visible = xlSheetVisible
+    ThisWorkbook.Sheets(targetName).Activate
+    MsgBox "「" & targetName & "」を復元しました！", vbInformation
+End Sub
+
+' ----------------------------------------------------------
 ' 4人用シートを新規作成（テンプレートをコピー）
 ' ----------------------------------------------------------
 Sub 新規シート_4人()
@@ -756,6 +842,11 @@ def build_howto(wb):
         ("", ""),
         ("【STEP 4】集計に追加する", ""),
         ("", "「集計に追加」マクロを実行 → 「マスター」シートに自動反映"),
+        ("", ""),
+        ("【セッションのアーカイブと復元】", ""),
+        ("", "・古いセッションを非表示にしたい場合：対象シートをアクティブにして「セッションをアーカイブ」マクロを実行"),
+        ("", "・アーカイブしたセッションを再表示したい場合：「アーカイブを復元」マクロを実行 → 一覧から番号を選択"),
+        ("", "※ マスター・設定・データ・使い方・サンプルシートはアーカイブ不可です"),
         ("", ""),
         ("【ウマ設定の変更】", ""),
         ("", "「設定」シート D2〜D5 の数値を変更してください（デフォルト: 20/10/-10/-20）"),
