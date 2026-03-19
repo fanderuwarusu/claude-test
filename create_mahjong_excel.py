@@ -578,7 +578,35 @@ VBA_CODE = '''
 ' ============================================================
 
 ' ----------------------------------------------------------
-' 4人用シートを新規作成（テンプレートをコピー）
+' 【シーン: メンバーを追加したい】
+' 参加者を「設定」シートのリストに追加する
+' ----------------------------------------------------------
+Sub メンバー追加()
+    Dim newName As String
+    newName = InputBox("追加するメンバーの名前を入力してください。", "メンバー追加")
+    If newName = "" Then Exit Sub
+
+    Dim wsConfig As Worksheet: Set wsConfig = Sheets("設定")
+
+    ' 重複チェック
+    Dim lastRow As Long
+    lastRow = wsConfig.Cells(wsConfig.Rows.Count, "A").End(xlUp).Row
+    Dim i As Long
+    For i = 2 To lastRow
+        If wsConfig.Cells(i, 1).Value = newName Then
+            MsgBox "「" & newName & "」は既に登録されています。", vbExclamation
+            Exit Sub
+        End If
+    Next i
+
+    ' 末尾に追加
+    wsConfig.Cells(lastRow + 1, 1).Value = newName
+    MsgBox "「" & newName & "」を追加しました！" & vbCrLf & _
+           "次回から入力シートのプルダウンに表示されます。", vbInformation
+End Sub
+
+' ----------------------------------------------------------
+' 【シーン: 点数を記載したい】4人用シートを新規作成
 ' ----------------------------------------------------------
 Sub 新規シート_4人()
     Dim num As String
@@ -606,7 +634,7 @@ Sub 新規シート_4人()
 End Sub
 
 ' ----------------------------------------------------------
-' 8人用シートを新規作成
+' 【シーン: 点数を記載したい】8人用シートを新規作成
 ' ----------------------------------------------------------
 Sub 新規シート_8人()
     Dim num As String
@@ -635,7 +663,7 @@ Sub 新規シート_8人()
 End Sub
 
 ' ----------------------------------------------------------
-' アクティブシートのデータをデータシートに集計
+' 【シーン: 点数を記載したい】アクティブシートのデータを集計
 ' ----------------------------------------------------------
 Sub 集計に追加()
     Dim ws     As Worksheet: Set ws = ActiveSheet
@@ -665,7 +693,7 @@ Sub 集計に追加()
     Dim lastRow As Long
     Dim r As Integer
 
-    ' ── 4人シート判定（B2行から下に4行 or 8行）
+    ' ── 4人シート判定（8人 or 4人）
     Dim is8player As Boolean
     is8player = (InStr(ws.Name, "8人") > 0 Or ws.Range("A13").Value <> "")
 
@@ -724,81 +752,185 @@ End Function
 def build_howto(wb):
     ws = wb.create_sheet("使い方")
 
-    ws.column_dimensions["A"].width = 3
-    ws.column_dimensions["B"].width = 60
-    ws.column_dimensions["C"].width = 40
+    # 列幅設定
+    ws.column_dimensions["A"].width = 3    # 左余白
+    ws.column_dimensions["B"].width = 5    # インデント用
+    ws.column_dimensions["C"].width = 55   # 説明本文
+    ws.column_dimensions["D"].width = 30   # 補足・注記
 
+    TOTAL_COLS = 4  # A〜D
+
+    def howto_title_row(row, text):
+        ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=TOTAL_COLS)
+        c = ws.cell(row=row, column=1, value=text)
+        c.font = Font(bold=True, size=16, color="FFFFFF", name="游ゴシック")
+        c.fill = fill(C["navy"])
+        c.alignment = Alignment(horizontal="center", vertical="center")
+        ws.row_dimensions[row].height = 44
+
+    def scene_header(row, text, color):
+        ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=TOTAL_COLS)
+        c = ws.cell(row=row, column=1, value=text)
+        c.font = Font(bold=True, size=13, color="FFFFFF", name="游ゴシック")
+        c.fill = fill(color)
+        c.alignment = Alignment(horizontal="left", vertical="center", indent=1)
+        ws.row_dimensions[row].height = 32
+
+    def step_header(row, text):
+        ws.merge_cells(start_row=row, start_column=2, end_row=row, end_column=TOTAL_COLS)
+        c = ws.cell(row=row, column=2, value=text)
+        c.font = Font(bold=True, size=11, color=C["navy"], name="游ゴシック")
+        c.fill = fill("E8F0FE")
+        c.alignment = Alignment(horizontal="left", vertical="center", indent=1)
+        ws.row_dimensions[row].height = 24
+
+    def desc_row(row, text, note="", warn=False):
+        c = ws.cell(row=row, column=3, value=text)
+        c.font = Font(size=10, color="222222" if not warn else "B71C1C", name="游ゴシック")
+        c.alignment = Alignment(horizontal="left", vertical="center", indent=1, wrap_text=True)
+        ws.row_dimensions[row].height = 20
+        if note:
+            nc = ws.cell(row=row, column=4, value=note)
+            nc.font = Font(size=9, color="555555", italic=True, name="游ゴシック")
+            nc.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+
+    def macro_badge(row, macro_name):
+        """マクロ名バッジ（緑背景）"""
+        ws.merge_cells(start_row=row, start_column=3, end_row=row, end_column=TOTAL_COLS)
+        c = ws.cell(row=row, column=3,
+                    value=f'▶ マクロ実行: 「{macro_name}」')
+        c.font = Font(bold=True, size=10, color="FFFFFF", name="游ゴシック")
+        c.fill = fill(C["green"])
+        c.alignment = Alignment(horizontal="left", vertical="center", indent=2)
+        ws.row_dimensions[row].height = 24
+
+    def gap(row, h=8):
+        ws.row_dimensions[row].height = h
+
+    # ══════════════════════════════════════════
     # タイトル
-    ws.merge_cells("A1:C1")
-    ws["A1"] = "使い方ガイド"
-    ws["A1"].font  = Font(bold=True, size=16, color="FFFFFF", name="游ゴシック")
-    ws["A1"].fill  = fill(C["navy"])
-    ws["A1"].alignment = align()
-    ws.row_dimensions[1].height = 40
+    # ══════════════════════════════════════════
+    r = 1
+    howto_title_row(r, "使い方ガイド  ―  シーン別操作手順")
 
-    steps = [
-        ("", ""),
-        ("【STEP 1】参加者を登録する", ""),
-        ("", "「設定」シート（非表示）の A列に部員名を追加してください。"),
-        ("", "→ シートタブを右クリック ▶ [再表示] ▶ 設定 を選択"),
-        ("", ""),
-        ("【STEP 2】各回のシートを作成する", ""),
-        ("", "・4人の場合：「新規シート_4人」マクロを実行"),
-        ("", "・8人の場合：「新規シート_8人」マクロを実行"),
-        ("", "→ [開発] タブ ▶ [マクロ] ▶ 実行  (または割り当てたボタンを押す)"),
-        ("", ""),
-        ("【STEP 3】結果を入力する", ""),
-        ("", "・参加者：プルダウンから選択"),
-        ("", "・順位：1〜4 をプルダウンから選択"),
-        ("", "・点数：素点を入力（例: 42000）"),
-        ("", "・ウマ・収支 は自動計算されます"),
-        ("", "・8人の場合、A卓とB卓 に分けて入力 → 同卓が一目でわかります"),
-        ("", ""),
-        ("【STEP 4】集計に追加する", ""),
-        ("", "「集計に追加」マクロを実行 → 「マスター」シートに自動反映"),
-        ("", ""),
-        ("【ウマ設定の変更】", ""),
-        ("", "「設定」シート D2〜D5 の数値を変更してください（デフォルト: 20/10/-10/-20）"),
-        ("", "返し点は 設定!C7（デフォルト: 30000）"),
-        ("", ""),
-        ("【VBAの追加方法】", ""),
-        ("", "① Excel で Alt+F11 を押す"),
-        ("", "② 左ペインでブック名を右クリック ▶ 挿入 ▶ 標準モジュール"),
-        ("", "③ 下のコードボックス内のコードを貼り付ける"),
-        ("", "④ Alt+F11 で戻る → [開発] タブ ▶ [マクロ] で実行できます"),
-        ("", ""),
-    ]
+    # ── VBA 導入前提（折りたたみ可能な注意書き）
+    r += 1
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=TOTAL_COLS)
+    c = ws.cell(row=r, column=1,
+                value="⚠  このファイルはマクロ（VBA）を使用します。最初に「VBAの設定」セクションを参照してください。")
+    c.font = Font(bold=True, size=10, color="7B3F00", name="游ゴシック")
+    c.fill = fill("FFF8E1")
+    c.alignment = Alignment(horizontal="left", vertical="center", indent=1)
+    ws.row_dimensions[r].height = 22
 
-    for r, (title, desc) in enumerate(steps, 2):
-        ws.row_dimensions[r].height = 18
-        if title.startswith("【"):
-            cell_t = ws.cell(row=r, column=2, value=title)
-            cell_t.font = Font(bold=True, size=11, color=C["navy"], name="游ゴシック")
-            cell_t.fill = fill("E8F0FE")
-        elif title:
-            ws.cell(row=r, column=2, value=title)
-        if desc:
-            cell_d = ws.cell(row=r, column=2, value=desc)
-            cell_d.font = Font(size=10, name="游ゴシック")
-            cell_d.alignment = Alignment(horizontal="left", vertical="center", indent=2)
+    # ══════════════════════════════════════════
+    # ─── シーン 0: VBA の設定（前提）
+    # ══════════════════════════════════════════
+    r += 1; gap(r); r += 1
+    scene_header(r, "⚙  VBAの設定（はじめに1回だけ）", C["gray_hd"])
 
-    # VBAコード表示
-    r_start = len(steps) + 3
-    ws.merge_cells(f"A{r_start}:C{r_start}")
-    ws.cell(row=r_start, column=1, value="▼ VBAコード（以下をコピーして標準モジュールに貼り付け）")
-    ws.cell(row=r_start, column=1).font = Font(bold=True, size=11, color="FFFFFF", name="游ゴシック")
-    ws.cell(row=r_start, column=1).fill = fill(C["teal"])
-    ws.cell(row=r_start, column=1).alignment = align()
-    ws.row_dimensions[r_start].height = 28
+    r += 1
+    step_header(r, "STEP 1 ｜ VBAコードを貼り付ける")
+    r += 1; desc_row(r, "① Excel で  Alt + F11  を押す（VBAエディターを開く）")
+    r += 1; desc_row(r, "② 左ペインでブック名を右クリック ▶ 挿入 ▶ 標準モジュール")
+    r += 1; desc_row(r, "③ このシート末尾の「VBAコード」を全選択してコピーし、モジュールに貼り付ける")
+    r += 1; desc_row(r, "④ Alt + F11 で Excel に戻る")
 
-    r_code = r_start + 1
-    ws.merge_cells(f"A{r_code}:C{r_code + 80}")
-    cell_vba = ws.cell(row=r_code, column=1, value=VBA_CODE.strip())
-    cell_vba.font = Font(size=9, name="Courier New", color="1A1A2E")
-    cell_vba.fill = fill("F8F8F2")
-    cell_vba.alignment = Alignment(horizontal="left", vertical="top",
-                                    wrap_text=True)
-    ws.row_dimensions[r_code].height = 15
+    r += 1
+    step_header(r, "STEP 2 ｜ マクロを有効にする")
+    r += 1; desc_row(r, "ファイルを開くとき「コンテンツを有効にする」を必ずクリックしてください。",
+                     note="※ .xlsm 形式で保存すること（マクロ有効ブック）")
+
+    # ══════════════════════════════════════════
+    # ─── シーン 1: 点数を記載したい（基本操作）
+    # ══════════════════════════════════════════
+    r += 1; gap(r); r += 1
+    scene_header(r, "🀇  シーン①  点数を記載したい（基本操作）", C["teal"])
+
+    r += 1
+    step_header(r, "STEP 1 ｜ 今回の入力シートを作成する")
+    r += 1; desc_row(r, "・4人で対局 → 「新規シート_4人」マクロを実行",
+                     note="サンプルシートをコピーして日付・回数をセットします")
+    r += 1; macro_badge(r, "新規シート_4人")
+    r += 1; desc_row(r, "・8人で対局（A卓／B卓） → 「新規シート_8人」マクロを実行")
+    r += 1; macro_badge(r, "新規シート_8人")
+    r += 1; desc_row(r, "  → 回数・日付を入力するダイアログが出るので入力してください。")
+
+    r += 1
+    step_header(r, "STEP 2 ｜ 点数を入力する")
+    r += 1; desc_row(r, "① 参加者列（A列）：プルダウンからメンバー名を選択",
+                     note="名前がない場合は「シーン②メンバー追加」を先に行ってください")
+    r += 1; desc_row(r, "② 順位列（B列）：1〜4 をプルダウンから選択")
+    r += 1; desc_row(r, "③ 点数列（C列）：素点を直接入力  （例: 42000）",
+                     note="ウマ・収支は自動計算されます")
+    r += 1; desc_row(r, "④ 確認：シート下部の「点数合計」が 100,000 になっていればOK",
+                     note="※ 30,000 × 4人 = 120,000 ではなく持ち点次第で変わります", warn=False)
+
+    r += 1
+    step_header(r, "STEP 3 ｜ マスターに反映する")
+    r += 1; desc_row(r, "入力完了後、「集計に追加」マクロを実行してください。",
+                     note="マスターシートの成績・順位が自動更新されます")
+    r += 1; macro_badge(r, "集計に追加")
+    r += 1; desc_row(r, "  → 同じ回を再登録する場合、上書き確認ダイアログが表示されます。")
+
+    # ══════════════════════════════════════════
+    # ─── シーン 2: メンバーを追加したい（特例）
+    # ══════════════════════════════════════════
+    r += 1; gap(r); r += 1
+    scene_header(r, "👤  シーン②  メンバーを追加したい（特例）", "7B1FA2")
+
+    r += 1
+    step_header(r, "方法A（推奨）｜ マクロで追加する  ※ 最も簡単")
+    r += 1; desc_row(r, "「メンバー追加」マクロを実行し、名前を入力するだけ。",
+                     note="重複チェックもマクロが行います")
+    r += 1; macro_badge(r, "メンバー追加")
+    r += 1; desc_row(r, "  → 次回から点数入力シートのプルダウンに表示されます。")
+
+    r += 1
+    step_header(r, "方法B（手動）｜ 設定シートを直接編集する")
+    r += 1; desc_row(r, "① シートタブを右クリック ▶ [再表示] ▶「設定」を選択")
+    r += 1; desc_row(r, "② 設定シートの A列（A2 以降）に名前を追記する")
+    r += 1; desc_row(r, "③ 設定シートを再び非表示にする（任意）",
+                     note="右クリック ▶ [非表示]")
+
+    r += 1
+    step_header(r, "注意事項")
+    r += 1; desc_row(r, "・メンバーを削除しても、既存の集計データは残ります（削除は手動でデータシートを編集）",
+                     warn=True)
+    r += 1; desc_row(r, "・名前を変更した場合、過去データの名前は自動で変わりません。",
+                     warn=True)
+
+    # ══════════════════════════════════════════
+    # ─── その他の設定変更
+    # ══════════════════════════════════════════
+    r += 1; gap(r); r += 1
+    scene_header(r, "🔧  その他の設定変更", C["gray_hd"])
+
+    r += 1
+    step_header(r, "ウマ・返し点を変更したい")
+    r += 1; desc_row(r, "設定シート D2〜D5：ウマの値（デフォルト +20 / +10 / -10 / -20）")
+    r += 1; desc_row(r, "設定シート C7：返し点（デフォルト 30000）",
+                     note="変更後は既存シートのウマ・収支も再計算されます")
+
+    # ══════════════════════════════════════════
+    # VBAコード全文
+    # ══════════════════════════════════════════
+    r += 1; gap(r); r += 1
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=TOTAL_COLS)
+    hdr = ws.cell(row=r, column=1,
+                  value="▼ VBAコード（以下を全選択 → コピーして標準モジュールに貼り付け）")
+    hdr.font = Font(bold=True, size=11, color="FFFFFF", name="游ゴシック")
+    hdr.fill = fill(C["teal"])
+    hdr.alignment = Alignment(horizontal="left", vertical="center", indent=1)
+    ws.row_dimensions[r].height = 30
+
+    r += 1
+    ws.merge_cells(start_row=r, start_column=1, end_row=r + 110, end_column=TOTAL_COLS)
+    code_cell = ws.cell(row=r, column=1, value=VBA_CODE.strip())
+    code_cell.font = Font(size=9, name="Courier New", color="1A1A2E")
+    code_cell.fill = fill("F8F8F2")
+    code_cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=True)
+    ws.row_dimensions[r].height = 15
 
     return ws
 
