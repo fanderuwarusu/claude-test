@@ -1,3 +1,10 @@
+---
+name: research
+description: リサーチタスクを開始するスキル。論点ヒアリング → 仮説構造化 → デスクリサーチ → DeepResearch設計書生成 → Notion出力のエンドツーエンドワークフローを実行する。リサーチに関するタスクを受けたときに使用する。
+argument-hint: "[リサーチテーマや背景を自由に記述]"
+user-invocable: true
+---
+
 # /research スキル — AIリサーチワークフロー
 
 ## 概要
