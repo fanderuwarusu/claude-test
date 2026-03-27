@@ -1,6 +1,5 @@
 ---
 description: AI講義スライドを生成する（PPTX / PDF）
-argument-hint: "<テーマ> <枚数> <出力形式: pptx|pdf|both> [キーメッセ一覧]"
 ---
 
 # スライド生成スキル
@@ -10,36 +9,45 @@ argument-hint: "<テーマ> <枚数> <出力形式: pptx|pdf|both> [キーメッ
 
 ## ユーザー入力の読み取り方
 
-`$ARGUMENTS` を以下のように解釈してください：
+以下の形式を受け付けます：
+```
+/make-slides <テーマ> <枚数>枚 <pptx|pdf|both>
+キーメッセ1
+キーメッセ2
+...
+```
 
-1. **テーマ**：スライド全体のタイトル・対象講義名
-2. **枚数**：生成するスライドの総枚数（指定がなければ内容から適切に決める）
-3. **出力形式**：`pptx` / `pdf` / `both`（指定がなければ `both`）
-4. **キーメッセ一覧**：スライドごとの「1スライド＝1主張」で記述されたリスト
-
-キーメッセが省略されている場合は、テーマと枚数からあなたが構成を考えてください。
+- **テーマ**：スライド全体のタイトル・対象講義名
+- **枚数**：生成するスライドの総枚数（省略可。省略時は内容から適切に決める）
+- **出力形式**：`pptx` / `pdf` / `both`（省略時は `both`）
+- **キーメッセ一覧**：1行1スライドの主張（省略時はテーマから自動構成）
 
 ---
 
 ## 生成するスクリプトの構造
 
-生成するPythonスクリプトは **`SLIDE_DEFS` のみ** を記述し、レンダラーは `slide_lib` から import します。
+**重要：スクリプト冒頭で `slide_lib.py` の場所を動的に解決すること。**
 
 ```python
-import sys
-sys.path.insert(0, "/home/user/claude-test")  # slide_lib.py の場所
+import os, sys
+
+# slide_lib.py があるディレクトリを動的に解決
+_LIB_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _LIB_DIR)
 from slide_lib import build_pptx, build_pdf
 
-FILENAME = "<テーマをスネークケースまたは日本語でファイル名に>"
+FILENAME = "<テーマをスネークケースまたは日本語>"
 
 SLIDE_DEFS = [
     # ここだけを生成する
 ]
 
-# 出力形式に応じて呼び出す
-build_pptx(SLIDE_DEFS, FILENAME)   # pptx の場合
-build_pdf(SLIDE_DEFS, FILENAME)    # pdf の場合
+# 出力形式に応じて呼び出す（both の場合は両方）
+build_pptx(SLIDE_DEFS, FILENAME)
+build_pdf(SLIDE_DEFS, FILENAME)
 ```
+
+**注意：** `gen_<テーマ>.py` は `slide_lib.py` と同じディレクトリに書き込むこと。
 
 ---
 
@@ -55,7 +63,6 @@ build_pdf(SLIDE_DEFS, FILENAME)    # pdf の場合
 {"type": "agenda", "title": "本日のアジェンダ", "items": [
     ("0", "オープニング", "5分"),
     ("1", "セクション名", "XX分"),
-    # ...
 ]}
 ```
 
@@ -69,12 +76,12 @@ build_pdf(SLIDE_DEFS, FILENAME)    # pdf の場合
 {"type": "content",
  "title": "スライドタイトル",
  "bullets": [
-     "##見出し行（## で始めると強調）",
+     "##見出し行（## で始めると強調表示）",
      "通常の箇条書きテキスト",
  ],
- "ph": False,          # True にするとプレースホルダーボックスを追加
+ "ph": False,          # True でプレースホルダーボックスを追加
  "ph_label": "※...",  # ph=True のときのラベル
- "note": ""}           # 下部に小さく表示する注記
+ "note": ""}           # 下部注記
 ```
 
 ### `two_col`（2カラム比較）
@@ -113,26 +120,11 @@ build_pdf(SLIDE_DEFS, FILENAME)    # pdf の場合
 
 ## 実行手順
 
-1. ユーザーの入力を解析する
-2. 上記ルールに従い `SLIDE_DEFS` を設計する（枚数が指定されていればその枚数に合わせる）
-3. Pythonスクリプトを **新しいファイルとして書き込む**（ファイル名: `gen_<テーマ>.py`）
-4. `python gen_<テーマ>.py` で実行する
+1. ユーザーの入力（後述の `$ARGUMENTS`）を解析する
+2. 上記ルールに従い `SLIDE_DEFS` を設計する
+3. Pythonスクリプトを `slide_lib.py` と同じディレクトリに **`gen_<テーマ>.py`** として書き込む
+4. `python <書き込んだファイルのパス>` で実行する
 5. 生成されたファイル名と枚数をユーザーに報告する
-
----
-
-## 入力例と期待動作
-
-```
-/make-slides セキュリティ基礎研修 20枚 pptx
-個人情報保護法の基本
-フィッシング詐欺の手口と見分け方
-パスワード管理のベストプラクティス
-ランサムウェアの被害事例
-インシデント発生時の報告フロー
-```
-
-→ 上記5つのキーメッセをベースに残りのスライド構成（タイトル・アジェンダ・セクションなど）を補完し、計20枚の `SLIDE_DEFS` を生成・実行する。
 
 ---
 
