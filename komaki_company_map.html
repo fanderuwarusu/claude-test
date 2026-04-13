@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_44ca3b73281e68374c677059e06dcbd7 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+<div style="
+    position: fixed; bottom: 30px; left: 30px;
+    z-index: 1000; background: white;
+    border: 2px solid #ccc; border-radius: 8px;
+    padding: 12px 16px; font-family: 'Meiryo', sans-serif;
+    font-size: 12px; box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    min-width: 200px;
+">
+<b style="font-size:13px;">凡例</b><br><br>
+<i class="fa fa-star" style="color:green;"></i> 住友理工(株)小牧製作所（中心）<br><br>
+<i class="fa fa-building" style="color:cadetblue;"></i> 小牧市内企業<br>
+<i class="fa fa-building" style="color:red;"></i> 常滑市企業<br><br>
+<b>距離円</b><br>
+<span style="color:#2ECC71;">●</span> 1km &nbsp;
+<span style="color:#3498DB;">●</span> 3km &nbsp;
+<span style="color:#E67E22;">●</span> 5km<br>
+<span style="color:#E74C3C;">●</span> 10km &nbsp;
+<span style="color:#9B59B6;">●</span> 30km
+</div>
+    
+<div style="
+    position: fixed; top: 80px; right: 15px;
+    z-index: 1000; background: white;
+    border: 2px solid #ccc; border-radius: 8px;
+    padding: 10px 14px; font-family: 'Meiryo', sans-serif;
+    font-size: 11px; box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    max-width: 340px;
+">
+<b style="font-size:13px;">中心からの距離一覧</b>
+<table style="border-collapse:collapse; margin-top:6px; width:100%;">
+<tr style="background:#2C3E50; color:white;">
+    <th style="padding:4px 6px; text-align:left;">企業名</th>
+    <th style="padding:4px 6px; text-align:right;">距離</th>
+</tr>
+
+    <tr style="background:#E8F8F5;">
+        <td style="padding:3px 6px;">住友理工(株)小牧製作所</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">中心</td>
+    </tr>
+    
+    <tr style="background:white;">
+        <td style="padding:3px 6px;">(株)チェリオ中部</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">0.98 km</td>
+    </tr>
+    
+    <tr style="background:white;">
+        <td style="padding:3px 6px;">間口東海(株)小牧セットセンター出張所</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">1.44 km</td>
+    </tr>
+    
+    <tr style="background:white;">
+        <td style="padding:3px 6px;">丸菱工業(株)</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">1.45 km</td>
+    </tr>
+    
+    <tr style="background:white;">
+        <td style="padding:3px 6px;">極東開発工業(株)名古屋工場</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">1.60 km</td>
+    </tr>
+    
+    <tr style="background:white;">
+        <td style="padding:3px 6px;">(株)両口屋是清小牧工場</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">2.20 km</td>
+    </tr>
+    
+    <tr style="background:white;">
+        <td style="padding:3px 6px;">日本特殊陶業(株)小牧工場</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">2.95 km</td>
+    </tr>
+    
+    <tr style="background:white;">
+        <td style="padding:3px 6px;">株式会社サカイフィールド</td>
+        <td style="padding:3px 6px; text-align:right; font-weight:bold;">41.36 km</td>
+    </tr>
+    
+</table>
+<p style="margin:6px 0 0 0; color:#888; font-size:10px;">※中心: 住友理工(株)小牧製作所</p>
+</div>
+    
+            <div class="folium-map" id="map_44ca3b73281e68374c677059e06dcbd7" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_44ca3b73281e68374c677059e06dcbd7 = L.map(
+                "map_44ca3b73281e68374c677059e06dcbd7",
+                {
+                    center: [35.289, 136.9113],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_4fcd48d8d3cc1fb9f345e254a535293b = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_4fcd48d8d3cc1fb9f345e254a535293b.addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var circle_80662cee0a86a68818e613eb3f5282a6 = L.circle(
+                [35.289, 136.9113],
+                {"bubblingMouseEvents": true, "color": "#2ECC71", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2ECC71", "fillOpacity": 0.04, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.6, "radius": 1000, "stroke": true, "weight": 1.5}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            circle_80662cee0a86a68818e613eb3f5282a6.bindTooltip(
+                `<div>
+                     1km圏
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_312fa21afd5229d7fba74db961653d55 = L.circle(
+                [35.289, 136.9113],
+                {"bubblingMouseEvents": true, "color": "#3498DB", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3498DB", "fillOpacity": 0.04, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.6, "radius": 3000, "stroke": true, "weight": 1.5}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            circle_312fa21afd5229d7fba74db961653d55.bindTooltip(
+                `<div>
+                     3km圏
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_9a7b760d2d6d29d699693ec9ec11f292 = L.circle(
+                [35.289, 136.9113],
+                {"bubblingMouseEvents": true, "color": "#E67E22", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#E67E22", "fillOpacity": 0.04, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.6, "radius": 5000, "stroke": true, "weight": 1.5}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            circle_9a7b760d2d6d29d699693ec9ec11f292.bindTooltip(
+                `<div>
+                     5km圏
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_e1b29d943bd61d95c506f392608d13c9 = L.circle(
+                [35.289, 136.9113],
+                {"bubblingMouseEvents": true, "color": "#E74C3C", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#E74C3C", "fillOpacity": 0.04, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.6, "radius": 10000, "stroke": true, "weight": 1.5}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            circle_e1b29d943bd61d95c506f392608d13c9.bindTooltip(
+                `<div>
+                     10km圏
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_7466d94a2d5eefec884c3ec5b6e3a3f0 = L.circle(
+                [35.289, 136.9113],
+                {"bubblingMouseEvents": true, "color": "#9B59B6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#9B59B6", "fillOpacity": 0.04, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.6, "radius": 30000, "stroke": true, "weight": 1.5}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            circle_7466d94a2d5eefec884c3ec5b6e3a3f0.bindTooltip(
+                `<div>
+                     30km圏
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_89272fded02694c7b0b0d99ec484a510 = L.marker(
+                [34.9178, 136.8695],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_ace769181f784d1fd15417cf4529e000 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "building",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_5809577ecc1702fd4ca4768265f1d10e = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_ac57df200c1bc3cbe0441ab852024b10 = $(`<div id="html_ac57df200c1bc3cbe0441ab852024b10" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">株式会社サカイフィールド</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県常滑市西阿野古池255</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:#E74C3C;"><b>41.36 km</b></span>         </p>     </div>     </div>`)[0];
+                popup_5809577ecc1702fd4ca4768265f1d10e.setContent(html_ac57df200c1bc3cbe0441ab852024b10);
+            
+        
+
+        marker_89272fded02694c7b0b0d99ec484a510.bindPopup(popup_5809577ecc1702fd4ca4768265f1d10e)
+        ;
+
+        
+    
+    
+            marker_89272fded02694c7b0b0d99ec484a510.bindTooltip(
+                `<div>
+                     株式会社サカイフィールド  (41.4 km)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_89272fded02694c7b0b0d99ec484a510.setIcon(icon_ace769181f784d1fd15417cf4529e000);
+            
+    
+            var marker_eb0829c2e7de077178119844b0360c59 = L.marker(
+                [35.2983, 136.9248],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_1bb79c64f2754b2c6a8b0118ef19535f = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "building",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_22e8aa0dbeb3a22845fc78a17ad3688e = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_020abe2ed4492d7b2494156fe48977ca = $(`<div id="html_020abe2ed4492d7b2494156fe48977ca" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">極東開発工業(株)名古屋工場</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県小牧市東田中字松本1375</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:#E74C3C;"><b>1.60 km</b></span>         </p>     </div>     </div>`)[0];
+                popup_22e8aa0dbeb3a22845fc78a17ad3688e.setContent(html_020abe2ed4492d7b2494156fe48977ca);
+            
+        
+
+        marker_eb0829c2e7de077178119844b0360c59.bindPopup(popup_22e8aa0dbeb3a22845fc78a17ad3688e)
+        ;
+
+        
+    
+    
+            marker_eb0829c2e7de077178119844b0360c59.bindTooltip(
+                `<div>
+                     極東開発工業(株)名古屋工場  (1.6 km)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_eb0829c2e7de077178119844b0360c59.setIcon(icon_1bb79c64f2754b2c6a8b0118ef19535f);
+            
+    
+            var marker_7f8340059585d9110c4f0a1bb40fe43b = L.marker(
+                [35.289, 136.9113],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_fa2e6e5141494bad7c23699bdcb15d43 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "star",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_fbd40cf9849e57bfe1d740e200028873 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_781ba0b9ca6fe24d3bec22e83bee2a0e = $(`<div id="html_781ba0b9ca6fe24d3bec22e83bee2a0e" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">住友理工(株)小牧製作所</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県小牧市東三丁目1番地</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:green;">中心地点</span>         </p>     </div>     </div>`)[0];
+                popup_fbd40cf9849e57bfe1d740e200028873.setContent(html_781ba0b9ca6fe24d3bec22e83bee2a0e);
+            
+        
+
+        marker_7f8340059585d9110c4f0a1bb40fe43b.bindPopup(popup_fbd40cf9849e57bfe1d740e200028873)
+        ;
+
+        
+    
+    
+            marker_7f8340059585d9110c4f0a1bb40fe43b.bindTooltip(
+                `<div>
+                     ★ 住友理工(株)小牧製作所（中心）
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_7f8340059585d9110c4f0a1bb40fe43b.setIcon(icon_fa2e6e5141494bad7c23699bdcb15d43);
+            
+    
+            var marker_566a270ed33dea63e40e6c846273fe13 = L.marker(
+                [35.2848, 136.9018],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_05c74e09a8b8c48dae906196abffbad0 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "building",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_a909a2b94a12ef368d82c63e16014fba = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_01f6e8a9e02f2e25f2fac7565f2ccbc8 = $(`<div id="html_01f6e8a9e02f2e25f2fac7565f2ccbc8" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">(株)チェリオ中部</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県小牧市大字河内屋新田字下岩倉入510-1</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:#E74C3C;"><b>0.98 km</b></span>         </p>     </div>     </div>`)[0];
+                popup_a909a2b94a12ef368d82c63e16014fba.setContent(html_01f6e8a9e02f2e25f2fac7565f2ccbc8);
+            
+        
+
+        marker_566a270ed33dea63e40e6c846273fe13.bindPopup(popup_a909a2b94a12ef368d82c63e16014fba)
+        ;
+
+        
+    
+    
+            marker_566a270ed33dea63e40e6c846273fe13.bindTooltip(
+                `<div>
+                     (株)チェリオ中部  (1.0 km)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_566a270ed33dea63e40e6c846273fe13.setIcon(icon_05c74e09a8b8c48dae906196abffbad0);
+            
+    
+            var marker_4beeeb579bfa76903e8a2c4df41c383b = L.marker(
+                [35.3128, 136.8968],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_d205743402c0c277a876c16a39a7ed62 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "building",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_6cf2958fbd4c2ede88e5a816a6df2ff8 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_f8edc1b47f9e801a14843f2a1ab58b6c = $(`<div id="html_f8edc1b47f9e801a14843f2a1ab58b6c" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">日本特殊陶業(株)小牧工場</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県小牧市大字岩崎2808</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:#E74C3C;"><b>2.95 km</b></span>         </p>     </div>     </div>`)[0];
+                popup_6cf2958fbd4c2ede88e5a816a6df2ff8.setContent(html_f8edc1b47f9e801a14843f2a1ab58b6c);
+            
+        
+
+        marker_4beeeb579bfa76903e8a2c4df41c383b.bindPopup(popup_6cf2958fbd4c2ede88e5a816a6df2ff8)
+        ;
+
+        
+    
+    
+            marker_4beeeb579bfa76903e8a2c4df41c383b.bindTooltip(
+                `<div>
+                     日本特殊陶業(株)小牧工場  (3.0 km)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_4beeeb579bfa76903e8a2c4df41c383b.setIcon(icon_d205743402c0c277a876c16a39a7ed62);
+            
+    
+            var marker_5d891ed5feebb0ef80a3956270751f84 = L.marker(
+                [35.297, 136.9238],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_5d23ad6113db5b044be06d76ae38dd31 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "building",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_9bbe3bd5978cfd1e54e5cb5fff086fe6 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_5b3cdf038e9caf64cc6683a1c9b63d10 = $(`<div id="html_5b3cdf038e9caf64cc6683a1c9b63d10" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">間口東海(株)小牧セットセンター出張所</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県小牧市大字東田中字南新田1605番地1</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:#E74C3C;"><b>1.44 km</b></span>         </p>     </div>     </div>`)[0];
+                popup_9bbe3bd5978cfd1e54e5cb5fff086fe6.setContent(html_5b3cdf038e9caf64cc6683a1c9b63d10);
+            
+        
+
+        marker_5d891ed5feebb0ef80a3956270751f84.bindPopup(popup_9bbe3bd5978cfd1e54e5cb5fff086fe6)
+        ;
+
+        
+    
+    
+            marker_5d891ed5feebb0ef80a3956270751f84.bindTooltip(
+                `<div>
+                     間口東海(株)小牧セットセンター出張所  (1.4 km)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_5d891ed5feebb0ef80a3956270751f84.setIcon(icon_5d23ad6113db5b044be06d76ae38dd31);
+            
+    
+            var marker_73c721214871d21ba37fb150b249d30b = L.marker(
+                [35.2762, 136.9082],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_1f440d2519b5f59e8c29e82feb26eb79 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "building",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_78c91be75c0b685910e2eadd77cc140f = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_87d534b4d8b83da5b65d7eee7943183b = $(`<div id="html_87d534b4d8b83da5b65d7eee7943183b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">丸菱工業(株)</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県小牧市大字本庄字山ノ内1251-3</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:#E74C3C;"><b>1.45 km</b></span>         </p>     </div>     </div>`)[0];
+                popup_78c91be75c0b685910e2eadd77cc140f.setContent(html_87d534b4d8b83da5b65d7eee7943183b);
+            
+        
+
+        marker_73c721214871d21ba37fb150b249d30b.bindPopup(popup_78c91be75c0b685910e2eadd77cc140f)
+        ;
+
+        
+    
+    
+            marker_73c721214871d21ba37fb150b249d30b.bindTooltip(
+                `<div>
+                     丸菱工業(株)  (1.4 km)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_73c721214871d21ba37fb150b249d30b.setIcon(icon_1f440d2519b5f59e8c29e82feb26eb79);
+            
+    
+            var marker_81c3e52e71ff9e60e2a0f9c8df6d2671 = L.marker(
+                [35.3088, 136.9103],
+                {
+}
+            ).addTo(map_44ca3b73281e68374c677059e06dcbd7);
+        
+    
+            var icon_1191590609b576b4c52eb7e026bf812e = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "building",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_ad906d0e6d60edc4c5a43cf2466754c6 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_813b29e1363bd277bc3c83974d844b0b = $(`<div id="html_813b29e1363bd277bc3c83974d844b0b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: 'Meiryo', sans-serif; min-width: 220px;">         <h4 style="margin:0 0 6px 0; color:#2C3E50;">(株)両口屋是清小牧工場</h4>         <p style="margin:2px 0; font-size:12px; color:#555;">📍 愛知県小牧市大字間々字浦通り18</p>         <p style="margin:4px 0; font-size:13px;">             <b>中心からの距離:</b>             <span style="color:#E74C3C;"><b>2.20 km</b></span>         </p>     </div>     </div>`)[0];
+                popup_ad906d0e6d60edc4c5a43cf2466754c6.setContent(html_813b29e1363bd277bc3c83974d844b0b);
+            
+        
+
+        marker_81c3e52e71ff9e60e2a0f9c8df6d2671.bindPopup(popup_ad906d0e6d60edc4c5a43cf2466754c6)
+        ;
+
+        
+    
+    
+            marker_81c3e52e71ff9e60e2a0f9c8df6d2671.bindTooltip(
+                `<div>
+                     (株)両口屋是清小牧工場  (2.2 km)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_81c3e52e71ff9e60e2a0f9c8df6d2671.setIcon(icon_1191590609b576b4c52eb7e026bf812e);
+            
+</script>
+</html>
